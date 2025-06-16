@@ -1,23 +1,23 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { TaskProvider } from './contexts/TaskContext';
-import { ThemeProvider } from './contexts/ThemeContext';
-import Layout from './components/Layout';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
+import Layout from './components/Layout'; // Assuming Layout component exists and is your main app layout
+import { TaskProvider } from './contexts/TaskContext'; // Assuming you have these context providers
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <TaskProvider>
-          {/* You might want to conditionally render Layout based on the route */}
+    <ThemeProvider>
+      <TaskProvider>
+        <Router>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            {/* Add a route for your main application content */}
-            <Route path="/" element={<Layout />} />
+            {/* This route will render the Layout for all other paths */}
+            <Route path="*" element={<Layout />} /> 
           </Routes>
-        </TaskProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+        </Router>
+      </TaskProvider>
+    </ThemeProvider>
   );
 }
 

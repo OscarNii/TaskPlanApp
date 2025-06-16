@@ -1,26 +1,26 @@
 import React from 'react';
 
 const LoginPage: React.FC = () => {
-  const handleGmailLogin = () => {
-    console.log('Attempting to login with Gmail...');
-    // Placeholder for Gmail login logic
+  const handleGoogleLogin = () => {
+    console.log('Attempting to login with Google...');
+    // Add Google login logic here
   };
 
   const handleGitHubLogin = () => {
     console.log('Attempting to login with GitHub...');
-    // Placeholder for GitHub login logic
+    // Add GitHub login logic here
   };
 
   const handleAppleLogin = () => {
     console.log('Attempting to login with Apple...');
-    // Placeholder for Apple login logic
+    // Add Apple login logic here
   };
 
   return (
     <div className="login-page">
       <h2>Login</h2>
       <div>
-        <button onClick={handleGmailLogin}>Login with Gmail</button>
+        <button onClick={handleGoogleLogin}>Login with Google</button>
       </div>
       <div>
         <button onClick={handleGitHubLogin}>Login with GitHub</button>

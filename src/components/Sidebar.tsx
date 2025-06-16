@@ -26,8 +26,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const stats = getTaskStats();
 
   const navigationItems = [
-    { id: 'list', icon: LayoutDashboard, label: 'Dashboard', count: stats.total },
-    { id: 'list', icon: CheckSquare, label: 'Tasks', count: stats.pending },
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', count: stats.total },
+    { id: 'tasks', icon: CheckSquare, label: 'Tasks', count: stats.pending },
     { id: 'calendar', icon: Calendar, label: 'Calendar', count: null },
   ];
 
