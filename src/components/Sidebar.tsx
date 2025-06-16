@@ -6,11 +6,12 @@ import {
   CheckSquare, 
   Calendar,
   Plus,
-  Hash,
   Moon,
   Sun,
   Settings,
-  X
+  X,
+  LogIn,
+  UserPlus
 } from 'lucide-react';
 import AddProjectModal from './AddProjectModal';
 
@@ -140,6 +141,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white">
             <Settings size={20} />
             <span className="font-medium">Settings</span>
+          </button>
+        </div>
+
+        {/* Guest/Auth Section */}
+        <div className="p-4 border-t border-white/20 dark:border-white/10 space-y-2">
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white">
+            <LogIn size={20} /> 
+            <span className="font-medium">Login</span>
+          </button>
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white">
+            <UserPlus size={20} /> 
+            <span className="font-medium">Sign Up</span>
           </button>
         </div>
       </div>
