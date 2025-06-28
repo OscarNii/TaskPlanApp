@@ -128,15 +128,19 @@ const LoginPage: React.FC = () => {
 
         if (user) {
           // Store user session (in production, use proper auth tokens)
-          localStorage.setItem('taskflow-user', JSON.stringify({
+          const userData = {
             id: user.id,
             email: user.email,
             name: user.name,
             loginTime: new Date().toISOString()
-          }));
+          };
+          
+          localStorage.setItem('taskflow-user', JSON.stringify(userData));
           
           console.log('✅ Sign in successful:', user.name);
-          navigate('/');
+          
+          // Force a page reload to trigger authentication state update
+          window.location.href = '/';
         } else {
           setErrors({ general: 'Invalid email or password. Please try again.' });
         }
@@ -150,15 +154,19 @@ const LoginPage: React.FC = () => {
         };
 
         // Store user session
-        localStorage.setItem('taskflow-user', JSON.stringify({
+        const userData = {
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
           loginTime: new Date().toISOString()
-        }));
+        };
+        
+        localStorage.setItem('taskflow-user', JSON.stringify(userData));
 
         console.log('✅ Sign up successful:', newUser.name);
-        navigate('/');
+        
+        // Force a page reload to trigger authentication state update
+        window.location.href = '/';
       }
     } catch (error) {
       setErrors({ general: 'Something went wrong. Please try again.' });
@@ -183,16 +191,16 @@ const LoginPage: React.FC = () => {
         id: Date.now().toString(),
         email: `user@${provider.toLowerCase()}.com`,
         name: `${provider} User`,
-        provider
+        provider,
+        loginTime: new Date().toISOString()
       };
 
-      localStorage.setItem('taskflow-user', JSON.stringify({
-        ...socialUser,
-        loginTime: new Date().toISOString()
-      }));
+      localStorage.setItem('taskflow-user', JSON.stringify(socialUser));
 
       console.log(`✅ ${provider} login successful:`, socialUser.name);
-      navigate('/');
+      
+      // Force a page reload to trigger authentication state update
+      window.location.href = '/';
     } catch (error) {
       setErrors({ general: `Failed to sign in with ${provider}. Please try again.` });
       console.error(`${provider} login error:`, error);
@@ -213,7 +221,9 @@ const LoginPage: React.FC = () => {
 
     localStorage.setItem('taskflow-user', JSON.stringify(guestUser));
     console.log('🏠 Navigating to homepage as guest');
-    navigate('/');
+    
+    // Force a page reload to trigger authentication state update
+    window.location.href = '/';
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -286,7 +296,7 @@ const LoginPage: React.FC = () => {
           <div className="flex bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-1 mb-6 sm:mb-8 border border-white/20">
             <button
               type="button"
-              onClick={() => !isLoading && setIsLogin(true)}
+              onClick={() => !isLoading && toggleAuthMode()}
               disabled={isLoading}
               className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 disabled:opacity-50 text-sm sm:text-base ${
                 isLogin 
@@ -298,7 +308,7 @@ const LoginPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => !isLoading && setIsLogin(false)}
+              onClick={() => !isLoading && toggleAuthMode()}
               disabled={isLoading}
               className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 disabled:opacity-50 text-sm sm:text-base ${
                 !isLogin 

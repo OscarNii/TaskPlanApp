@@ -10,8 +10,34 @@ function App() {
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem('taskflow-user');
-    setIsAuthenticated(!!userData);
+    const checkAuth = () => {
+      const userData = localStorage.getItem('taskflow-user');
+      setIsAuthenticated(!!userData);
+    };
+
+    // Initial check
+    checkAuth();
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'taskflow-user') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Listen for custom auth events
+    const handleAuthChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-change', handleAuthChange);
+    };
   }, []);
 
   // Show loading state while checking authentication
