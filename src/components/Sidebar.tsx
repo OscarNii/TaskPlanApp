@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -20,13 +20,34 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+interface UserData {
+  id: string;
+  email: string;
+  name: string;
+  loginTime: string;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { projects, viewMode, setViewMode, getTaskStats } = useTask();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const stats = getTaskStats();
+
+  // Check for logged in user
+  useEffect(() => {
+    const userData = localStorage.getItem('taskflow-user');
+    if (userData) {
+      try {
+        setCurrentUser(JSON.parse(userData));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('taskflow-user');
+      }
+    }
+  }, []);
 
   const navigationItems = [
     { 
@@ -56,7 +77,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   ];
 
   const handleLogout = () => {
-    // In a real app, you'd clear auth tokens here
+    localStorage.removeItem('taskflow-user');
+    setCurrentUser(null);
+    setShowUserMenu(false);
     navigate('/login');
   };
 
@@ -67,6 +90,31 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const handleNavigation = (item: typeof navigationItems[0]) => {
     item.onClick();
     onClose();
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const formatLoginTime = (loginTime: string) => {
+    const date = new Date(loginTime);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 0) {
+      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    } else if (diffHours > 0) {
+      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    } else {
+      return 'Just now';
+    }
   };
 
   return (
@@ -235,27 +283,58 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           {/* User Section */}
           <div className="p-4 border-t border-white/20 dark:border-white/10">
             <div className="relative">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white bg-white/5 backdrop-blur-sm border border-white/10 group"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110">
-                  <User size={16} className="text-white" />
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <div className="text-sm font-medium text-white truncate">Guest User</div>
-                  <div className="text-xs text-white/60 truncate">guest@taskflow.com</div>
-                </div>
-              </button>
+              {currentUser ? (
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white bg-white/5 backdrop-blur-sm border border-white/10 group"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 text-white font-semibold text-sm">
+                    {getInitials(currentUser.name)}
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="text-sm font-medium text-white truncate">{currentUser.name}</div>
+                    <div className="text-xs text-white/60 truncate">
+                      Active {formatLoginTime(currentUser.loginTime)}
+                    </div>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  onClick={handleLogin}
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white bg-white/5 backdrop-blur-sm border border-white/10 group"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110">
+                    <User size={16} className="text-white" />
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="text-sm font-medium text-white">Sign In</div>
+                    <div className="text-xs text-white/60">Access your tasks</div>
+                  </div>
+                </button>
+              )}
 
-              {showUserMenu && (
+              {showUserMenu && currentUser && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden z-50">
+                  <div className="p-4 border-b border-white/20">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold">
+                        {getInitials(currentUser.name)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-white truncate">{currentUser.name}</div>
+                        <div className="text-xs text-white/60 truncate">{currentUser.email}</div>
+                      </div>
+                    </div>
+                  </div>
                   <button
-                    onClick={handleLogin}
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      // Navigate to profile settings
+                    }}
                     className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-white/80 hover:text-white flex items-center space-x-3"
                   >
                     <User size={16} />
-                    <span className="text-sm">Sign In</span>
+                    <span className="text-sm">Profile Settings</span>
                   </button>
                   <button
                     onClick={handleLogout}
