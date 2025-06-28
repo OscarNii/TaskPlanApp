@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -10,8 +11,8 @@ import {
   Sun,
   Settings,
   X,
-  LogIn,
-  UserPlus
+  LogOut,
+  User
 } from 'lucide-react';
 import AddProjectModal from './AddProjectModal';
 
@@ -22,7 +23,9 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { projects, viewMode, setViewMode, getTaskStats } = useTask();
   const { isDark, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const stats = getTaskStats();
 
   const navigationItems = [
@@ -30,6 +33,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { id: 'tasks', icon: CheckSquare, label: 'Tasks', count: stats.pending },
     { id: 'calendar', icon: Calendar, label: 'Calendar', count: null },
   ];
+
+  const handleLogout = () => {
+    // In a real app, you'd clear auth tokens here
+    navigate('/login');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
 
   return (
     <>
@@ -129,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Settings */}
         <div className="p-4 border-t border-white/20 dark:border-white/10 space-y-2">
           <button
             onClick={toggleTheme}
@@ -144,16 +156,41 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Guest/Auth Section */}
-        <div className="p-4 border-t border-white/20 dark:border-white/10 space-y-2">
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white">
-            <LogIn size={20} /> 
-            <span className="font-medium">Login</span>
-          </button>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white">
-            <UserPlus size={20} /> 
-            <span className="font-medium">Sign Up</span>
-          </button>
+        {/* User Section */}
+        <div className="p-4 border-t border-white/20 dark:border-white/10">
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-white/80 hover:text-white bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center">
+                <User size={16} className="text-white" />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="text-sm font-medium text-white">Guest User</div>
+                <div className="text-xs text-white/60">guest@taskflow.com</div>
+              </div>
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden">
+                <button
+                  onClick={handleLogin}
+                  className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-white/80 hover:text-white flex items-center space-x-3"
+                >
+                  <User size={16} />
+                  <span className="text-sm">Sign In</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-3 text-left hover:bg-red-500/20 transition-colors text-red-400 hover:text-red-300 flex items-center space-x-3"
+                >
+                  <LogOut size={16} />
+                  <span className="text-sm">Sign Out</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
