@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Dashboard from './Dashboard';
@@ -8,8 +9,25 @@ import { useTask } from '../contexts/TaskContext';
 import { Menu, X } from 'lucide-react';
 
 const Layout: React.FC = () => {
-  const { viewMode } = useTask();
+  const { viewMode, setViewMode } = useTask();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  // Update view mode based on current route
+  useEffect(() => {
+    switch (location.pathname) {
+      case '/tasks':
+        setViewMode('list');
+        break;
+      case '/calendar':
+        setViewMode('calendar');
+        break;
+      case '/':
+      default:
+        setViewMode('dashboard');
+        break;
+    }
+  }, [location.pathname, setViewMode]);
 
   const renderMainContent = () => {
     switch (viewMode) {
@@ -60,7 +78,7 @@ const Layout: React.FC = () => {
       <div className="lg:ml-80 min-h-screen">
         <Header />
         <main className="p-4 lg:p-8 relative z-10">
-          {viewMode === 'list' ? <Dashboard /> : renderMainContent()}
+          {renderMainContent()}
         </main>
       </div>
     </div>

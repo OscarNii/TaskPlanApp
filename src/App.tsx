@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import Layout from './components/Layout'; // Assuming Layout component exists and is your main app layout
-import { TaskProvider } from './contexts/TaskContext'; // Assuming you have these context providers
+import Layout from './components/Layout';
+import { TaskProvider } from './contexts/TaskContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
@@ -12,8 +12,9 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            {/* This route will render the Layout for all other paths */}
-            <Route path="*" element={<Layout />} /> 
+            <Route path="/tasks" element={<Layout />} />
+            <Route path="/calendar" element={<Layout />} />
+            <Route path="/" element={<Layout />} />
           </Routes>
         </Router>
       </TaskProvider>
