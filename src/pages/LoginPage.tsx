@@ -12,7 +12,8 @@ import {
   Chrome,
   Apple,
   Check,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 interface FormData {
@@ -200,6 +201,21 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleGoToHomepage = () => {
+    // Create a guest user session for demo purposes
+    const guestUser = {
+      id: 'guest',
+      email: 'guest@taskflow.com',
+      name: 'Guest User',
+      loginTime: new Date().toISOString(),
+      isGuest: true
+    };
+
+    localStorage.setItem('taskflow-user', JSON.stringify(guestUser));
+    console.log('🏠 Navigating to homepage as guest');
+    navigate('/');
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -236,6 +252,17 @@ const LoginPage: React.FC = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
+
+      {/* Homepage button - positioned at top right */}
+      <button
+        onClick={handleGoToHomepage}
+        disabled={isLoading}
+        className="fixed top-6 right-6 z-50 flex items-center space-x-2 px-6 py-3 bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 group disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+      >
+        <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
+        <span className="font-medium">Go to Homepage</span>
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </button>
 
       {/* Main container */}
       <div className="w-full max-w-md relative z-10">
@@ -295,6 +322,17 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Guest access info */}
+          <div className="mb-6 p-4 bg-green-500/10 border border-green-400/30 rounded-xl">
+            <h4 className="text-green-300 font-medium mb-2 flex items-center">
+              <Home className="w-4 h-4 mr-2" />
+              Quick Access
+            </h4>
+            <p className="text-sm text-green-200/80">
+              Want to explore TaskFlow? Click the "Go to Homepage" button above to access the app as a guest user.
+            </p>
+          </div>
 
           {/* General error message */}
           {errors.general && (
