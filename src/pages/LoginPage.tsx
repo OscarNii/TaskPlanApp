@@ -55,6 +55,12 @@ const LoginPage: React.FC = () => {
     { id: '3', email: 'jane@example.com', password: 'password123', name: 'Jane Smith' }
   ];
 
+  // Helper function to trigger auth state change
+  const triggerAuthChange = () => {
+    // Dispatch custom event to notify App component
+    window.dispatchEvent(new CustomEvent('auth-change'));
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -139,8 +145,9 @@ const LoginPage: React.FC = () => {
           
           console.log('✅ Sign in successful:', user.name);
           
-          // Force a page reload to trigger authentication state update
-          window.location.href = '/';
+          // Trigger auth state change and navigate
+          triggerAuthChange();
+          navigate('/');
         } else {
           setErrors({ general: 'Invalid email or password. Please try again.' });
         }
@@ -165,8 +172,9 @@ const LoginPage: React.FC = () => {
 
         console.log('✅ Sign up successful:', newUser.name);
         
-        // Force a page reload to trigger authentication state update
-        window.location.href = '/';
+        // Trigger auth state change and navigate
+        triggerAuthChange();
+        navigate('/');
       }
     } catch (error) {
       setErrors({ general: 'Something went wrong. Please try again.' });
@@ -199,8 +207,9 @@ const LoginPage: React.FC = () => {
 
       console.log(`✅ ${provider} login successful:`, socialUser.name);
       
-      // Force a page reload to trigger authentication state update
-      window.location.href = '/';
+      // Trigger auth state change and navigate
+      triggerAuthChange();
+      navigate('/');
     } catch (error) {
       setErrors({ general: `Failed to sign in with ${provider}. Please try again.` });
       console.error(`${provider} login error:`, error);
@@ -222,8 +231,9 @@ const LoginPage: React.FC = () => {
     localStorage.setItem('taskflow-user', JSON.stringify(guestUser));
     console.log('🏠 Navigating to homepage as guest');
     
-    // Force a page reload to trigger authentication state update
-    window.location.href = '/';
+    // Trigger auth state change and navigate
+    triggerAuthChange();
+    navigate('/');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
