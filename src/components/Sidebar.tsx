@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../contexts/TaskContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   CheckSquare, 
   Calendar,
   Plus,
-  Moon,
-  Sun,
   Settings,
   X,
   LogOut,
@@ -29,7 +26,6 @@ interface UserData {
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { projects, viewMode, setViewMode, getTaskStats } = useTask();
-  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -296,15 +292,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div className="flex-shrink-0 border-t border-white/20 dark:border-white/10">
           {/* Settings */}
           <div className="p-3 sm:p-4 space-y-1 sm:space-y-2">
-            <button
-              onClick={toggleTheme}
-              className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white group"
-            >
-              <div className="transition-transform group-hover:scale-110 flex-shrink-0">
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
-              </div>
-              <span className="font-medium text-sm sm:text-base">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
-            </button>
             <button className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white group">
               <Settings size={18} className="transition-transform group-hover:scale-110 flex-shrink-0" />
               <span className="font-medium text-sm sm:text-base">Settings</span>
