@@ -34,4 +34,24 @@ export interface FilterOptions {
   dateRange: 'all' | 'today' | 'week' | 'month';
 }
 
-export type ViewMode = 'list' | 'calendar' | 'kanban';
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  createdAt: Date;
+  preferences: {
+    theme: 'light' | 'dark';
+    notifications: {
+      email: boolean;
+      push: boolean;
+      dueTodayReminders: boolean;
+      dueTomorrowReminders: boolean;
+      overdueReminders: boolean;
+      weeklyDigest: boolean;
+      reminderTime: string;
+    };
+  };
+}
+
+export type ViewMode = 'list' | 'calendar' | 'kanban' | 'dashboard';

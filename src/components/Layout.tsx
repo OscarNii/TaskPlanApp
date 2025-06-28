@@ -6,12 +6,19 @@ import Dashboard from './Dashboard';
 import TaskList from './TaskList';
 import Calendar from './Calendar';
 import { useTask } from '../contexts/TaskContext';
+import { useNotifications } from '../hooks/useNotifications';
 import { Menu, X } from 'lucide-react';
 
 const Layout: React.FC = () => {
   const { viewMode, setViewMode } = useTask();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+
+  // Mock user ID - in a real app, this would come from auth context
+  const userId = 'user-1';
+  
+  // Initialize notifications
+  useNotifications(userId);
 
   // Update view mode based on current route
   useEffect(() => {

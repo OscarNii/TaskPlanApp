@@ -1,15 +1,20 @@
 import React from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, Filter, Plus, ArrowLeft } from 'lucide-react';
+import { Search, Filter, Plus, ArrowLeft, Bell } from 'lucide-react';
 import AddTaskModal from './AddTaskModal';
 import FilterModal from './FilterModal';
+import NotificationCenter from './NotificationCenter';
 
 const Header: React.FC = () => {
   const { filterOptions, setFilterOptions, viewMode } = useTask();
   const [showAddTask, setShowAddTask] = React.useState(false);
   const [showFilter, setShowFilter] = React.useState(false);
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const location = useLocation();
+
+  // Mock user ID - in a real app, this would come from auth context
+  const userId = 'user-1';
 
   const getPageTitle = () => {
     switch (viewMode) {
@@ -102,6 +107,16 @@ const Header: React.FC = () => {
                 </div>
               )}
 
+              {/* Notifications */}
+              <button
+                onClick={() => setShowNotifications(true)}
+                className="relative p-3 bg-white/10 dark:bg-black/20 backdrop-blur-xl hover:bg-white/20 dark:hover:bg-white/10 rounded-xl transition-all duration-300 border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl text-white/80 hover:text-white"
+              >
+                <Bell size={20} />
+                {/* Notification badge */}
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white/20"></span>
+              </button>
+
               {/* Filter button - only show on task list */}
               {viewMode === 'list' && (
                 <button
@@ -151,6 +166,13 @@ const Header: React.FC = () => {
       {showFilter && (
         <FilterModal
           onClose={() => setShowFilter(false)}
+        />
+      )}
+
+      {showNotifications && (
+        <NotificationCenter
+          userId={userId}
+          onClose={() => setShowNotifications(false)}
         />
       )}
     </>
