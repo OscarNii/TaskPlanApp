@@ -6,6 +6,7 @@ import {
   LayoutDashboard, 
   CheckSquare, 
   Calendar,
+  Kanban,
   Plus,
   X,
   LogOut,
@@ -41,6 +42,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       count: stats.pending,
       path: '/tasks',
       onClick: () => setViewMode('list')
+    },
+    { 
+      id: 'kanban', 
+      icon: Kanban, 
+      label: 'Kanban', 
+      count: null,
+      path: '/kanban',
+      onClick: () => setViewMode('kanban')
     },
     { 
       id: 'calendar', 

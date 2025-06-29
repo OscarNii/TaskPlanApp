@@ -66,6 +66,14 @@ function App() {
                 } 
               />
               <Route 
+                path="/kanban" 
+                element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/calendar" 
                 element={
                   <ProtectedRoute>

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useTask } from '../contexts/TaskContext';
+import { Task } from '../types';
 import { X, Plus, Trash2 } from 'lucide-react';
 
 interface AddTaskModalProps {
   onClose: () => void;
   onAdd: () => void;
+  defaultStatus?: Task['status'];
 }
 
-const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
+const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd, defaultStatus = 'todo' }) => {
   const { addTask, projects } = useTask();
   const [formData, setFormData] = useState({
     title: '',
@@ -17,6 +19,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
     projectId: projects[0]?.id || '',
     tags: [] as string[],
     subtasks: [] as { id: string; title: string; completed: boolean }[],
+    status: defaultStatus,
   });
   const [newTag, setNewTag] = useState('');
   const [newSubtask, setNewSubtask] = useState('');
@@ -28,7 +31,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
     addTask({
       ...formData,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-      completed: false,
+      completed: formData.status === 'done',
     });
     onAdd();
   };
@@ -70,6 +73,13 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
       subtasks: prev.subtasks.filter(st => st.id !== id)
     }));
   };
+
+  const statusOptions = [
+    { value: 'todo', label: 'To Do', color: 'text-slate-300' },
+    { value: 'in-progress', label: 'In Progress', color: 'text-blue-300' },
+    { value: 'review', label: 'Review', color: 'text-amber-300' },
+    { value: 'done', label: 'Done', color: 'text-green-300' },
+  ];
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -132,6 +142,25 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
 
             <div>
               <label className="block text-sm font-medium text-white/80 mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as Task['status'] }))}
+                className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white/10 backdrop-blur-xl text-white"
+              >
+                {statusOptions.map(option => (
+                  <option key={option.value} value={option.value} className="bg-slate-800">
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-white/80 mb-2">
                 Due Date
               </label>
               <input
@@ -141,21 +170,21 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ onClose, onAdd }) => {
                 className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white/10 backdrop-blur-xl text-white"
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
-              Project
-            </label>
-            <select
-              value={formData.projectId}
-              onChange={(e) => setFormData(prev => ({ ...prev, projectId: e.target.value }))}
-              className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white/10 backdrop-blur-xl text-white"
-            >
-              {projects.map(project => (
-                <option key={project.id} value={project.id} className="bg-slate-800">{project.name}</option>
-              ))}
-            </select>
+            <div>
+              <label className="block text-sm font-medium text-white/80 mb-2">
+                Project
+              </label>
+              <select
+                value={formData.projectId}
+                onChange={(e) => setFormData(prev => ({ ...prev, projectId: e.target.value }))}
+                className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white/10 backdrop-blur-xl text-white"
+              >
+                {projects.map(project => (
+                  <option key={project.id} value={project.id} className="bg-slate-800">{project.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>

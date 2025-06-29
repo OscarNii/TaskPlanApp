@@ -10,6 +10,7 @@ export interface Task {
   subtasks: Subtask[];
   createdAt: Date;
   updatedAt: Date;
+  status: 'todo' | 'in-progress' | 'review' | 'done';
 }
 
 export interface Subtask {
@@ -55,3 +56,12 @@ export interface User {
 }
 
 export type ViewMode = 'list' | 'calendar' | 'kanban' | 'dashboard';
+
+export interface KanbanColumn {
+  id: string;
+  title: string;
+  status: Task['status'];
+  color: string;
+  icon: string;
+  description: string;
+}

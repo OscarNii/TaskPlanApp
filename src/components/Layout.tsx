@@ -5,6 +5,7 @@ import Header from './Header';
 import Dashboard from './Dashboard';
 import TaskList from './TaskList';
 import Calendar from './Calendar';
+import KanbanBoard from './KanbanBoard';
 import { useTask } from '../contexts/TaskContext';
 import { useNotifications } from '../hooks/useNotifications';
 import { Menu, X } from 'lucide-react';
@@ -26,6 +27,9 @@ const Layout: React.FC = () => {
       case '/tasks':
         setViewMode('list');
         break;
+      case '/kanban':
+        setViewMode('kanban');
+        break;
       case '/calendar':
         setViewMode('calendar');
         break;
@@ -40,6 +44,8 @@ const Layout: React.FC = () => {
     switch (viewMode) {
       case 'list':
         return <TaskList />;
+      case 'kanban':
+        return <KanbanBoard />;
       case 'calendar':
         return <Calendar />;
       default:

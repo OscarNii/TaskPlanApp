@@ -130,12 +130,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (savedTasks) {
         const tasksData = JSON.parse(savedTasks);
-        // Convert date strings back to Date objects
+        // Convert date strings back to Date objects and ensure status field exists
         const transformedTasks = tasksData.map((task: any) => ({
           ...task,
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
           createdAt: new Date(task.createdAt),
           updatedAt: new Date(task.updatedAt),
+          status: task.status || (task.completed ? 'done' : 'todo'), // Migrate old tasks
         }));
         setTasks(transformedTasks);
       } else {
@@ -170,6 +171,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date(),
         updatedAt: new Date(),
+        status: taskData.status || 'todo', // Ensure status is set
       };
 
       const updatedTasks = [newTask, ...tasks];
@@ -217,7 +219,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
-    await updateTask(id, { completed: !task.completed });
+    const newCompleted = !task.completed;
+    const newStatus = newCompleted ? 'done' : 'todo';
+
+    await updateTask(id, { 
+      completed: newCompleted,
+      status: newStatus
+    });
   };
 
   const addProject = async (projectData: Omit<Project, 'id' | 'taskCount' | 'completedTasks'>) => {
