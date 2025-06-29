@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTask } from '../contexts/TaskContext';
+import { useAuth } from '../contexts/AuthContext';
 import TaskCard from './TaskCard';
 import StatsCard from './StatsCard';
 import { 
@@ -13,6 +14,7 @@ import {
 
 const Dashboard: React.FC = () => {
   const { getFilteredTasks, getTaskStats, tasks } = useTask();
+  const { user, profile } = useAuth();
   const filteredTasks = getFilteredTasks();
   const stats = getTaskStats();
   
@@ -32,33 +34,75 @@ const Dashboard: React.FC = () => {
 
   const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
-  // Function to get time-based greeting
+  // Get user's first name for personalization
+  const getFirstName = () => {
+    if (!user || !profile) return 'there';
+    const fullName = profile.name || user.name || 'User';
+    return fullName.split(' ')[0];
+  };
+
+  // Function to get time-based greeting with user name
   const getTimeBasedGreeting = () => {
     const currentHour = new Date().getHours();
+    const firstName = getFirstName();
     
     if (currentHour >= 5 && currentHour < 12) {
-      return 'Good morning! ☀️';
+      return `Good morning, ${firstName}! ☀️`;
     } else if (currentHour >= 12 && currentHour < 17) {
-      return 'Good afternoon! 🌤️';
+      return `Good afternoon, ${firstName}! 🌤️`;
     } else if (currentHour >= 17 && currentHour < 21) {
-      return 'Good evening! 🌅';
+      return `Good evening, ${firstName}! 🌅`;
     } else {
-      return 'Good night! 🌙';
+      return `Good night, ${firstName}! 🌙`;
     }
   };
 
-  // Function to get time-based message
+  // Function to get time-based message with user context
   const getTimeBasedMessage = () => {
     const currentHour = new Date().getHours();
+    const firstName = getFirstName();
+    
+    if (stats.pending === 0) {
+      if (currentHour >= 5 && currentHour < 12) {
+        return `You're all caught up! Perfect way to start the day.`;
+      } else if (currentHour >= 12 && currentHour < 17) {
+        return `Excellent work! You've completed all your tasks.`;
+      } else if (currentHour >= 17 && currentHour < 21) {
+        return `Amazing! You've finished everything for today.`;
+      } else {
+        return `Well done! You can rest easy tonight.`;
+      }
+    }
     
     if (currentHour >= 5 && currentHour < 12) {
-      return `You have ${stats.pending} tasks to tackle today`;
+      return `Ready to tackle ${stats.pending} task${stats.pending !== 1 ? 's' : ''} today? Let's make it productive!`;
     } else if (currentHour >= 12 && currentHour < 17) {
-      return `You have ${stats.pending} tasks remaining for today`;
+      return `You have ${stats.pending} task${stats.pending !== 1 ? 's' : ''} remaining. Keep up the momentum!`;
     } else if (currentHour >= 17 && currentHour < 21) {
-      return `You have ${stats.pending} tasks to wrap up`;
+      return `${stats.pending} task${stats.pending !== 1 ? 's' : ''} left to wrap up. You're almost there!`;
     } else {
-      return `You have ${stats.pending} tasks for tomorrow`;
+      return `${stats.pending} task${stats.pending !== 1 ? 's' : ''} for tomorrow. Rest well and tackle them fresh!`;
+    }
+  };
+
+  // Function to get motivational subtitle based on completion rate
+  const getMotivationalSubtitle = () => {
+    if (stats.total === 0) {
+      return "Start by adding your first task to get organized!";
+    }
+    
+    if (completionRate === 100) {
+      return "🎉 Perfect! You've completed everything!";
+    } else if (completionRate >= 80) {
+      return "🔥 You're on fire! Almost there!";
+    } else if (completionRate >= 60) {
+      return "💪 Great progress! Keep it up!";
+    } else if (completionRate >= 40) {
+      return "📈 You're making steady progress!";
+    } else if (completionRate >= 20) {
+      return "🚀 Good start! Let's build momentum!";
+    } else {
+      return "✨ Every journey begins with a single step!";
     }
   };
 
@@ -71,12 +115,19 @@ const Dashboard: React.FC = () => {
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
               {getTimeBasedGreeting()}
             </h1>
-            <p className="text-white/80 text-lg">{getTimeBasedMessage()}</p>
+            <p className="text-white/80 text-lg mb-2">{getTimeBasedMessage()}</p>
+            <p className="text-white/60 text-base">{getMotivationalSubtitle()}</p>
           </div>
           <div className="hidden sm:block">
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-lg">
               <div className="text-3xl font-bold text-white">{completionRate}%</div>
               <div className="text-sm text-white/80">Completion Rate</div>
+              <div className="w-full bg-white/20 rounded-full h-2 mt-2">
+                <div 
+                  className="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${completionRate}%` }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>
@@ -124,7 +175,7 @@ const Dashboard: React.FC = () => {
               Due Today
             </h2>
             <span className="text-sm text-white/60 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              {todayTasks.length} tasks
+              {todayTasks.length} task{todayTasks.length !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -136,6 +187,7 @@ const Dashboard: React.FC = () => {
               <div className="text-center py-8 text-white/60">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No tasks due today</p>
+                <p className="text-sm mt-1">Enjoy your free time! 🎉</p>
               </div>
             )}
           </div>
@@ -149,7 +201,7 @@ const Dashboard: React.FC = () => {
               High Priority
             </h2>
             <span className="text-sm text-white/60 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              {highPriorityTasks.length} tasks
+              {highPriorityTasks.length} task{highPriorityTasks.length !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -161,6 +213,7 @@ const Dashboard: React.FC = () => {
               <div className="text-center py-8 text-white/60">
                 <CheckCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No high priority tasks</p>
+                <p className="text-sm mt-1">You're managing priorities well! 👍</p>
               </div>
             )}
           </div>
@@ -175,7 +228,7 @@ const Dashboard: React.FC = () => {
             All Tasks
           </h2>
           <span className="text-sm text-white/60 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-            {filteredTasks.length} tasks
+            {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''}
           </span>
         </div>
         <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -187,7 +240,7 @@ const Dashboard: React.FC = () => {
             <div className="text-center py-12 text-white/60">
               <CheckCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
               <p className="text-lg">No tasks found</p>
-              <p className="text-sm">Try adjusting your filters or add a new task</p>
+              <p className="text-sm">Try adjusting your filters or add a new task to get started</p>
             </div>
           )}
         </div>
