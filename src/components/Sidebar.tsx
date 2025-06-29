@@ -24,7 +24,7 @@ interface UserData {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
-  const { projects, viewMode, setViewMode, getTaskStats } = useTask();
+  const { projects, viewMode, setViewMode, getTaskStats, setFilterOptions } = useTask();
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -109,6 +109,32 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     onClose();
   };
 
+  const handleCompletedTasksClick = () => {
+    // Set filter to show only completed tasks
+    setFilterOptions({
+      search: '',
+      priority: 'all',
+      project: 'all',
+      status: 'completed',
+      dateRange: 'all',
+    });
+    setViewMode('list');
+    onClose();
+  };
+
+  const handlePendingTasksClick = () => {
+    // Set filter to show only pending tasks
+    setFilterOptions({
+      search: '',
+      priority: 'all',
+      project: 'all',
+      status: 'pending',
+      dateRange: 'all',
+    });
+    setViewMode('list');
+    onClose();
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -175,25 +201,27 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Link
               to="/tasks"
-              onClick={() => {
-                setViewMode('list');
-                onClose();
-              }}
-              className="bg-gradient-to-br from-emerald-400/20 to-blue-500/20 backdrop-blur-sm p-3 sm:p-4 rounded-lg sm:rounded-xl border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 block"
+              onClick={handleCompletedTasksClick}
+              className="bg-gradient-to-br from-emerald-400/20 to-blue-500/20 backdrop-blur-sm p-3 sm:p-4 rounded-lg sm:rounded-xl border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 block group"
             >
-              <div className="text-lg sm:text-2xl font-bold text-white">{stats.completed}</div>
-              <div className="text-xs sm:text-sm text-white/80">Completed</div>
+              <div className="text-lg sm:text-2xl font-bold text-white group-hover:text-emerald-200 transition-colors">
+                {stats.completed}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80 group-hover:text-white transition-colors">
+                Completed
+              </div>
             </Link>
             <Link
               to="/tasks"
-              onClick={() => {
-                setViewMode('list');
-                onClose();
-              }}
-              className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm p-3 sm:p-4 rounded-lg sm:rounded-xl border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 block"
+              onClick={handlePendingTasksClick}
+              className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm p-3 sm:p-4 rounded-lg sm:rounded-xl border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 block group"
             >
-              <div className="text-lg sm:text-2xl font-bold text-white">{stats.pending}</div>
-              <div className="text-xs sm:text-sm text-white/80">Pending</div>
+              <div className="text-lg sm:text-2xl font-bold text-white group-hover:text-amber-200 transition-colors">
+                {stats.pending}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80 group-hover:text-white transition-colors">
+                Pending
+              </div>
             </Link>
           </div>
         </div>
