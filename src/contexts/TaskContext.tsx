@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Project, FilterOptions, ViewMode } from '../types';
-import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
 interface TaskContextType {
@@ -74,31 +73,49 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const getStorageKey = (type: 'tasks' | 'projects') => {
+    return `taskflow-${type}-${user?.id}`;
+  };
+
   const loadProjects = async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error loading projects:', error);
-        return;
+      const storageKey = getStorageKey('projects');
+      const savedProjects = localStorage.getItem(storageKey);
+      
+      if (savedProjects) {
+        const projectsData = JSON.parse(savedProjects);
+        setProjects(projectsData);
+      } else {
+        // Create default projects for new users
+        const defaultProjects = [
+          {
+            id: 'project-1',
+            name: 'Personal',
+            color: '#3B82F6',
+            taskCount: 0,
+            completedTasks: 0,
+          },
+          {
+            id: 'project-2',
+            name: 'Work',
+            color: '#10B981',
+            taskCount: 0,
+            completedTasks: 0,
+          },
+          {
+            id: 'project-3',
+            name: 'Health',
+            color: '#8B5CF6',
+            taskCount: 0,
+            completedTasks: 0,
+          },
+        ];
+        
+        localStorage.setItem(storageKey, JSON.stringify(defaultProjects));
+        setProjects(defaultProjects);
       }
-
-      // Transform database projects to app format
-      const transformedProjects = data.map(project => ({
-        id: project.id,
-        name: project.name,
-        color: project.color,
-        taskCount: 0, // Will be calculated when tasks are loaded
-        completedTasks: 0, // Will be calculated when tasks are loaded
-      }));
-
-      setProjects(transformedProjects);
     } catch (error) {
       console.error('Error in loadProjects:', error);
     }
@@ -108,36 +125,37 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading tasks:', error);
-        return;
+      const storageKey = getStorageKey('tasks');
+      const savedTasks = localStorage.getItem(storageKey);
+      
+      if (savedTasks) {
+        const tasksData = JSON.parse(savedTasks);
+        // Convert date strings back to Date objects
+        const transformedTasks = tasksData.map((task: any) => ({
+          ...task,
+          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+          createdAt: new Date(task.createdAt),
+          updatedAt: new Date(task.updatedAt),
+        }));
+        setTasks(transformedTasks);
+      } else {
+        setTasks([]);
       }
-
-      // Transform database tasks to app format
-      const transformedTasks = data.map(task => ({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        completed: task.completed,
-        priority: task.priority,
-        dueDate: task.due_date ? new Date(task.due_date) : undefined,
-        projectId: task.project_id,
-        tags: task.tags || [],
-        subtasks: task.subtasks || [],
-        createdAt: new Date(task.created_at),
-        updatedAt: new Date(task.updated_at),
-      }));
-
-      setTasks(transformedTasks);
     } catch (error) {
       console.error('Error in loadTasks:', error);
     }
+  };
+
+  const saveTasks = (tasksToSave: Task[]) => {
+    if (!user) return;
+    const storageKey = getStorageKey('tasks');
+    localStorage.setItem(storageKey, JSON.stringify(tasksToSave));
+  };
+
+  const saveProjects = (projectsToSave: Project[]) => {
+    if (!user) return;
+    const storageKey = getStorageKey('projects');
+    localStorage.setItem(storageKey, JSON.stringify(projectsToSave));
   };
 
   const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -147,43 +165,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert({
-          user_id: user.id,
-          project_id: taskData.projectId,
-          title: taskData.title,
-          description: taskData.description,
-          completed: taskData.completed,
-          priority: taskData.priority,
-          due_date: taskData.dueDate?.toISOString(),
-          tags: taskData.tags,
-          subtasks: taskData.subtasks,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding task:', error);
-        return;
-      }
-
-      // Transform and add to local state
       const newTask: Task = {
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        completed: data.completed,
-        priority: data.priority,
-        dueDate: data.due_date ? new Date(data.due_date) : undefined,
-        projectId: data.project_id,
-        tags: data.tags || [],
-        subtasks: data.subtasks || [],
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
+        ...taskData,
+        id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      setTasks(prev => [newTask, ...prev]);
+      const updatedTasks = [newTask, ...tasks];
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      
+      console.log('✅ Task added successfully:', newTask.title);
     } catch (error) {
       console.error('Error in addTask:', error);
     }
@@ -193,32 +186,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
-      const updateData: any = {};
-      
-      if (updates.title !== undefined) updateData.title = updates.title;
-      if (updates.description !== undefined) updateData.description = updates.description;
-      if (updates.completed !== undefined) updateData.completed = updates.completed;
-      if (updates.priority !== undefined) updateData.priority = updates.priority;
-      if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate?.toISOString();
-      if (updates.projectId !== undefined) updateData.project_id = updates.projectId;
-      if (updates.tags !== undefined) updateData.tags = updates.tags;
-      if (updates.subtasks !== undefined) updateData.subtasks = updates.subtasks;
-
-      const { error } = await supabase
-        .from('tasks')
-        .update(updateData)
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error updating task:', error);
-        return;
-      }
-
-      // Update local state
-      setTasks(prev => prev.map(task => 
+      const updatedTasks = tasks.map(task => 
         task.id === id ? { ...task, ...updates, updatedAt: new Date() } : task
-      ));
+      );
+      
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      
+      console.log('✅ Task updated successfully:', id);
     } catch (error) {
       console.error('Error in updateTask:', error);
     }
@@ -228,19 +203,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error deleting task:', error);
-        return;
-      }
-
-      // Update local state
-      setTasks(prev => prev.filter(task => task.id !== id));
+      const updatedTasks = tasks.filter(task => task.id !== id);
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      
+      console.log('✅ Task deleted successfully:', id);
     } catch (error) {
       console.error('Error in deleteTask:', error);
     }
@@ -260,31 +227,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .insert({
-          user_id: user.id,
-          name: projectData.name,
-          color: projectData.color,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding project:', error);
-        return;
-      }
-
-      // Transform and add to local state
       const newProject: Project = {
-        id: data.id,
-        name: data.name,
-        color: data.color,
+        ...projectData,
+        id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         taskCount: 0,
         completedTasks: 0,
       };
 
-      setProjects(prev => [...prev, newProject]);
+      const updatedProjects = [...projects, newProject];
+      setProjects(updatedProjects);
+      saveProjects(updatedProjects);
+      
+      console.log('✅ Project added successfully:', newProject.name);
     } catch (error) {
       console.error('Error in addProject:', error);
     }
@@ -294,25 +248,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
-      const updateData: any = {};
-      if (updates.name !== undefined) updateData.name = updates.name;
-      if (updates.color !== undefined) updateData.color = updates.color;
-
-      const { error } = await supabase
-        .from('projects')
-        .update(updateData)
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error updating project:', error);
-        return;
-      }
-
-      // Update local state
-      setProjects(prev => prev.map(project =>
+      const updatedProjects = projects.map(project =>
         project.id === id ? { ...project, ...updates } : project
-      ));
+      );
+      
+      setProjects(updatedProjects);
+      saveProjects(updatedProjects);
+      
+      console.log('✅ Project updated successfully:', id);
     } catch (error) {
       console.error('Error in updateProject:', error);
     }
@@ -323,32 +266,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       // Delete all tasks in this project first
-      const { error: tasksError } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('project_id', id)
-        .eq('user_id', user.id);
-
-      if (tasksError) {
-        console.error('Error deleting project tasks:', tasksError);
-        return;
-      }
+      const updatedTasks = tasks.filter(task => task.projectId !== id);
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
 
       // Delete the project
-      const { error: projectError } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (projectError) {
-        console.error('Error deleting project:', projectError);
-        return;
-      }
-
-      // Update local state
-      setProjects(prev => prev.filter(project => project.id !== id));
-      setTasks(prev => prev.filter(task => task.projectId !== id));
+      const updatedProjects = projects.filter(project => project.id !== id);
+      setProjects(updatedProjects);
+      saveProjects(updatedProjects);
+      
+      console.log('✅ Project deleted successfully:', id);
     } catch (error) {
       console.error('Error in deleteProject:', error);
     }
@@ -401,7 +328,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Update project task counts when tasks change
   useEffect(() => {
-    setProjects(prev => prev.map(project => {
+    const updatedProjects = projects.map(project => {
       const projectTasks = tasks.filter(task => task.projectId === project.id);
       const completedTasks = projectTasks.filter(task => task.completed).length;
       return {
@@ -409,7 +336,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         taskCount: projectTasks.length,
         completedTasks,
       };
-    }));
+    });
+    
+    // Only update if there are actual changes
+    const hasChanges = updatedProjects.some((project, index) => {
+      const original = projects[index];
+      return original && (
+        original.taskCount !== project.taskCount || 
+        original.completedTasks !== project.completedTasks
+      );
+    });
+    
+    if (hasChanges) {
+      setProjects(updatedProjects);
+      saveProjects(updatedProjects);
+    }
   }, [tasks]);
 
   const value: TaskContextType = {

@@ -1,21 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+// This file is kept for type definitions but Supabase functionality is removed
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
-
-// Database types
+// Database types for reference
 export interface Database {
   public: {
     Tables: {
