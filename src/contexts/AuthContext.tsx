@@ -108,18 +108,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
-      // Create profile if user was created
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            name,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          });
+      // Create profile if user was created successfully
+      if (data.user && !error) {
+        try {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email!,
+              name,
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            });
 
-        if (profileError) {
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            // Don't return the profile error as the main error since auth succeeded
+            // The profile will be created on next login attempt or can be handled separately
+          }
+        } catch (profileError) {
           console.error('Error creating profile:', profileError);
         }
       }
