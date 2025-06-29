@@ -136,7 +136,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       sound: true
     },
     appearance: {
-      theme: 'system',
+      theme: isDark ? 'dark' : 'light',
       compactMode: false,
       animations: true,
       fontSize: 'medium'
@@ -192,6 +192,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       console.error('Error saving settings:', error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
+    updateSettings('appearance', 'theme', theme);
+    
+    // Apply theme immediately
+    if (theme === 'light') {
+      if (isDark) toggleTheme();
+    } else if (theme === 'dark') {
+      if (!isDark) toggleTheme();
+    } else if (theme === 'system') {
+      // Use system preference
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (systemPrefersDark && !isDark) {
+        toggleTheme();
+      } else if (!systemPrefersDark && isDark) {
+        toggleTheme();
+      }
     }
   };
 
@@ -276,7 +295,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   if (!settings) {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white/10 backdrop-blur-2xl rounded-2xl p-8 border border-white/20">
+        <div className="glass-morphism rounded-2xl p-8 border border-white/20">
           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
           <p className="text-white/80 mt-4 text-center">Loading settings...</p>
         </div>
@@ -286,14 +305,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white/10 dark:bg-black/20 backdrop-blur-2xl rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden border border-white/20 flex flex-col lg:flex-row">
+      <div className="glass-morphism-enhanced rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden border border-white/20 flex flex-col lg:flex-row">
         
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/20">
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/20 glass-header">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowMobileSidebar(true)}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white glass-button"
             >
               <Menu size={20} />
             </button>
@@ -303,7 +322,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-500/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-600 text-white rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 text-sm"
+              className="flex items-center space-x-2 px-3 py-2 glass-button-primary rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 text-sm"
             >
               {isSaving ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -316,7 +335,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white glass-button"
             >
               <X size={20} />
             </button>
@@ -326,12 +345,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         {/* Mobile Sidebar Overlay */}
         {showMobileSidebar && (
           <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex">
-            <div className="w-64 bg-white/10 backdrop-blur-2xl border-r border-white/20 p-4">
+            <div className="w-64 glass-morphism-sidebar border-r border-white/20 p-4">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Settings</h2>
                 <button
                   onClick={() => setShowMobileSidebar(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white"
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white glass-button"
                 >
                   <X size={20} />
                 </button>
@@ -341,9 +360,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 glass-nav-item ${
                       activeTab === tab.id
-                        ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white shadow-lg border border-white/20'
+                        ? 'glass-nav-active text-white shadow-lg border border-white/20'
                         : 'hover:bg-white/10 text-white/80 hover:text-white'
                     }`}
                   >
@@ -358,12 +377,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 bg-white/5 border-r border-white/20 p-6 flex-shrink-0">
+        <div className="hidden lg:block w-64 glass-sidebar border-r border-white/20 p-6 flex-shrink-0">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">Settings</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white glass-button"
             >
               <X size={20} />
             </button>
@@ -374,9 +393,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 glass-nav-item ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white shadow-lg border border-white/20'
+                    ? 'glass-nav-active text-white shadow-lg border border-white/20'
                     : 'hover:bg-white/10 text-white/80 hover:text-white'
                 }`}
               >
@@ -390,7 +409,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         {/* Content */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Desktop Header */}
-          <div className="hidden lg:block p-6 border-b border-white/20">
+          <div className="hidden lg:block p-6 border-b border-white/20 glass-header">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-bold text-white capitalize">{activeTab}</h3>
@@ -405,7 +424,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl border border-white/20 disabled:opacity-50"
+                className="flex items-center space-x-2 px-6 py-3 glass-button-primary rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl border border-white/20 disabled:opacity-50"
               >
                 {isSaving ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -433,7 +452,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                       type="text"
                       value={settings.profile.name}
                       onChange={(e) => updateSettings('profile', 'name', e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
                     />
                   </div>
 
@@ -445,7 +464,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                       type="email"
                       value={settings.profile.email}
                       onChange={(e) => updateSettings('profile', 'email', e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
                     />
                   </div>
 
@@ -456,7 +475,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                     <select
                       value={settings.profile.timezone}
                       onChange={(e) => updateSettings('profile', 'timezone', e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                     >
                       <option value="America/New_York" className="bg-slate-800">Eastern Time</option>
                       <option value="America/Chicago" className="bg-slate-800">Central Time</option>
@@ -475,7 +494,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                     <select
                       value={settings.profile.language}
                       onChange={(e) => updateSettings('profile', 'language', e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                     >
                       <option value="en" className="bg-slate-800">English</option>
                       <option value="es" className="bg-slate-800">Spanish</option>
@@ -487,7 +506,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 </div>
 
                 {/* Password Change Section - Responsive */}
-                <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                   <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                     <Key className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     Change Password
@@ -501,7 +520,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         type={showPassword ? 'text' : 'password'}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
                         placeholder="Enter current password"
                       />
                     </div>
@@ -513,7 +532,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         type={showPassword ? 'text' : 'password'}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
                         placeholder="Enter new password"
                       />
                     </div>
@@ -526,7 +545,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                           type={showPassword ? 'text' : 'password'}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white placeholder-white/60 text-sm sm:text-base"
                           placeholder="Confirm new password"
                         />
                         <button
@@ -539,7 +558,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                       </div>
                     </div>
                   </div>
-                  <button className="mt-3 sm:mt-4 px-3 sm:px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors text-sm sm:text-base">
+                  <button className="mt-3 sm:mt-4 px-3 sm:px-4 py-2 glass-button-secondary rounded-lg transition-colors text-sm sm:text-base">
                     Update Password
                   </button>
                 </div>
@@ -551,7 +570,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {/* Email Notifications */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Mail className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Email Notifications
@@ -571,7 +590,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                           </div>
                           <button
                             onClick={() => updateSettings('notifications', item.key, !settings.notifications[item.key as keyof typeof settings.notifications])}
-                            className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                            className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                               settings.notifications[item.key as keyof typeof settings.notifications] ? 'bg-blue-500' : 'bg-white/20'
                             }`}
                           >
@@ -587,7 +606,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   </div>
 
                   {/* Push Notifications */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Push Notifications
@@ -601,7 +620,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                           <span className="text-white/80 text-sm sm:text-base">{item.label}</span>
                           <button
                             onClick={() => updateSettings('notifications', item.key, !settings.notifications[item.key as keyof typeof settings.notifications])}
-                            className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                            className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                               settings.notifications[item.key as keyof typeof settings.notifications] ? 'bg-blue-500' : 'bg-white/20'
                             }`}
                           >
@@ -623,7 +642,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         type="time"
                         value={settings.notifications.reminderTime}
                         onChange={(e) => updateSettings('notifications', 'reminderTime', e.target.value)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                       />
                     </div>
                   </div>
@@ -636,35 +655,41 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {/* Theme Settings */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Palette className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Theme
                     </h4>
                     <div className="space-y-2 sm:space-y-3">
                       {[
-                        { value: 'light', label: 'Light', icon: Sun },
-                        { value: 'dark', label: 'Dark', icon: Moon },
-                        { value: 'system', label: 'System', icon: Monitor }
+                        { value: 'light', label: 'Light', icon: Sun, description: 'Clean and bright interface' },
+                        { value: 'dark', label: 'Dark', icon: Moon, description: 'Easy on the eyes' },
+                        { value: 'system', label: 'System', icon: Monitor, description: 'Follow system preference' }
                       ].map((theme) => (
                         <button
                           key={theme.value}
-                          onClick={() => updateSettings('appearance', 'theme', theme.value)}
-                          className={`w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg transition-colors text-sm sm:text-base ${
+                          onClick={() => handleThemeChange(theme.value as 'light' | 'dark' | 'system')}
+                          className={`w-full flex items-center space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-lg transition-all duration-300 text-sm sm:text-base glass-theme-option ${
                             settings.appearance.theme === theme.value
-                              ? 'bg-blue-500/20 border border-blue-400/30 text-blue-300'
+                              ? 'glass-theme-active border border-blue-400/30 text-blue-300'
                               : 'hover:bg-white/10 text-white/80'
                           }`}
                         >
-                          <theme.icon size={16} className="flex-shrink-0" />
-                          <span>{theme.label}</span>
+                          <theme.icon size={18} className="flex-shrink-0" />
+                          <div className="flex-1 text-left">
+                            <div className="font-medium">{theme.label}</div>
+                            <div className="text-xs text-white/60">{theme.description}</div>
+                          </div>
+                          {settings.appearance.theme === theme.value && (
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                          )}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Display Settings */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Eye className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Display
@@ -677,7 +702,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         <select
                           value={settings.appearance.fontSize}
                           onChange={(e) => updateSettings('appearance', 'fontSize', e.target.value)}
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                         >
                           <option value="small" className="bg-slate-800">Small</option>
                           <option value="medium" className="bg-slate-800">Medium</option>
@@ -689,7 +714,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         <span className="text-white/80 text-sm sm:text-base">Compact Mode</span>
                         <button
                           onClick={() => updateSettings('appearance', 'compactMode', !settings.appearance.compactMode)}
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                             settings.appearance.compactMode ? 'bg-blue-500' : 'bg-white/20'
                           }`}
                         >
@@ -705,7 +730,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         <span className="text-white/80 text-sm sm:text-base">Animations</span>
                         <button
                           onClick={() => updateSettings('appearance', 'animations', !settings.appearance.animations)}
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                             settings.appearance.animations ? 'bg-blue-500' : 'bg-white/20'
                           }`}
                         >
@@ -725,7 +750,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             {/* Privacy Tab - Responsive */}
             {activeTab === 'privacy' && (
               <div className="space-y-4 sm:space-y-6">
-                <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                   <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                     <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     Privacy & Data
@@ -748,14 +773,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         description: 'Share data with third-party services for enhanced features'
                       }
                     ].map((item) => (
-                      <div key={item.key} className="flex items-start justify-between p-3 sm:p-4 bg-white/5 rounded-lg">
+                      <div key={item.key} className="flex items-start justify-between p-3 sm:p-4 glass-privacy-item rounded-lg">
                         <div className="flex-1 pr-3">
                           <h5 className="text-white font-medium text-sm sm:text-base">{item.label}</h5>
                           <p className="text-white/60 text-xs sm:text-sm mt-1">{item.description}</p>
                         </div>
                         <button
                           onClick={() => updateSettings('privacy', item.key, !settings.privacy[item.key as keyof typeof settings.privacy])}
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors flex-shrink-0 glass-toggle ${
                             settings.privacy[item.key as keyof typeof settings.privacy] ? 'bg-blue-500' : 'bg-white/20'
                           }`}
                         >
@@ -777,7 +802,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {/* Performance Settings */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Database className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Performance
@@ -787,7 +812,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         <span className="text-white/80 text-sm sm:text-base">Auto Save</span>
                         <button
                           onClick={() => updateSettings('advanced', 'autoSave', !settings.advanced.autoSave)}
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                             settings.advanced.autoSave ? 'bg-blue-500' : 'bg-white/20'
                           }`}
                         >
@@ -806,7 +831,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         <select
                           value={settings.advanced.backupFrequency}
                           onChange={(e) => updateSettings('advanced', 'backupFrequency', e.target.value)}
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                         >
                           <option value="daily" className="bg-slate-800">Daily</option>
                           <option value="weekly" className="bg-slate-800">Weekly</option>
@@ -822,7 +847,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                           type="number"
                           value={settings.advanced.maxTasks}
                           onChange={(e) => updateSettings('advanced', 'maxTasks', parseInt(e.target.value))}
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 glass-input rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm sm:text-base"
                           min="100"
                           max="10000"
                         />
@@ -831,7 +856,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   </div>
 
                   {/* Data Management */}
-                  <div className="bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  <div className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
                     <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
                       <Database className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Data Management
@@ -839,13 +864,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                     <div className="space-y-2 sm:space-y-3">
                       <button
                         onClick={handleExportData}
-                        className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors text-sm sm:text-base"
+                        className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 glass-button-secondary rounded-lg transition-colors text-sm sm:text-base"
                       >
                         <Download size={16} className="flex-shrink-0" />
                         <span>Export Data</span>
                       </button>
 
-                      <label className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-colors cursor-pointer text-sm sm:text-base">
+                      <label className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 glass-button-success rounded-lg transition-colors cursor-pointer text-sm sm:text-base">
                         <Upload size={16} className="flex-shrink-0" />
                         <span>Import Data</span>
                         <input
@@ -858,7 +883,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
                       <button
                         onClick={handleClearData}
-                        className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors text-sm sm:text-base"
+                        className="w-full flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 glass-button-danger rounded-lg transition-colors text-sm sm:text-base"
                       >
                         <Trash2 size={16} className="flex-shrink-0" />
                         <span>Clear All Data</span>
@@ -873,7 +898,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                         </div>
                         <button
                           onClick={() => updateSettings('advanced', 'debugMode', !settings.advanced.debugMode)}
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${
+                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors glass-toggle ${
                             settings.advanced.debugMode ? 'bg-orange-500' : 'bg-white/20'
                           }`}
                         >
