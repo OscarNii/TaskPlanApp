@@ -333,14 +333,13 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Light mode overrides */
+/* Light mode overrides - ONLY for specific components */
 .light .glass-morphism {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  color: rgb(31, 41, 55);
 }
 
 .light .glass-morphism-enhanced {
@@ -354,20 +353,6 @@
     0 16px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  color: rgb(31, 41, 55);
-}
-
-.light .glass-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.7) 100%
-  );
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  color: rgb(31, 41, 55);
 }
 
 .light .glass-input {
@@ -634,13 +619,11 @@ html {
 /* Light mode body styles */
 body.light {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  color: rgb(31, 41, 55);
 }
 
 /* Dark mode body styles */
 body.dark {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white;
 }
 
 /* Theme transition */
@@ -648,99 +631,284 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light mode text color overrides */
-.light * {
-  color: rgb(31, 41, 55);
+/* PRESERVE ORIGINAL COLORS FOR MAIN PAGES */
+/* Dashboard, Task List, Calendar, and Sidebar should maintain white text */
+.main-content,
+.main-content *,
+[data-page="dashboard"],
+[data-page="dashboard"] *,
+[data-page="tasks"],
+[data-page="tasks"] *,
+[data-page="calendar"],
+[data-page="calendar"] *,
+.sidebar-content,
+.sidebar-content * {
+  color: white !important;
 }
 
-.light h1,
-.light h2,
-.light h3,
-.light h4,
-.light h5,
-.light h6 {
-  color: rgb(17, 24, 39);
+/* Preserve specific colored text in main pages */
+.main-content .text-blue-300,
+.main-content .text-blue-400,
+.main-content .text-blue-500,
+[data-page="dashboard"] .text-blue-300,
+[data-page="dashboard"] .text-blue-400,
+[data-page="dashboard"] .text-blue-500,
+[data-page="tasks"] .text-blue-300,
+[data-page="tasks"] .text-blue-400,
+[data-page="tasks"] .text-blue-500,
+[data-page="calendar"] .text-blue-300,
+[data-page="calendar"] .text-blue-400,
+[data-page="calendar"] .text-blue-500 {
+  color: rgb(147, 197, 253) !important;
 }
 
-.light p,
-.light span,
-.light div {
-  color: rgb(31, 41, 55);
+.main-content .text-green-300,
+.main-content .text-green-400,
+.main-content .text-green-500,
+[data-page="dashboard"] .text-green-300,
+[data-page="dashboard"] .text-green-400,
+[data-page="dashboard"] .text-green-500,
+[data-page="tasks"] .text-green-300,
+[data-page="tasks"] .text-green-400,
+[data-page="tasks"] .text-green-500,
+[data-page="calendar"] .text-green-300,
+[data-page="calendar"] .text-green-400,
+[data-page="calendar"] .text-green-500 {
+  color: rgb(134, 239, 172) !important;
 }
 
-.light .text-white {
+.main-content .text-red-300,
+.main-content .text-red-400,
+.main-content .text-red-500,
+[data-page="dashboard"] .text-red-300,
+[data-page="dashboard"] .text-red-400,
+[data-page="dashboard"] .text-red-500,
+[data-page="tasks"] .text-red-300,
+[data-page="tasks"] .text-red-400,
+[data-page="tasks"] .text-red-500,
+[data-page="calendar"] .text-red-300,
+[data-page="calendar"] .text-red-400,
+[data-page="calendar"] .text-red-500 {
+  color: rgb(252, 165, 165) !important;
+}
+
+.main-content .text-yellow-300,
+.main-content .text-yellow-400,
+.main-content .text-yellow-500,
+[data-page="dashboard"] .text-yellow-300,
+[data-page="dashboard"] .text-yellow-400,
+[data-page="dashboard"] .text-yellow-500,
+[data-page="tasks"] .text-yellow-300,
+[data-page="tasks"] .text-yellow-400,
+[data-page="tasks"] .text-yellow-500,
+[data-page="calendar"] .text-yellow-300,
+[data-page="calendar"] .text-yellow-400,
+[data-page="calendar"] .text-yellow-500 {
+  color: rgb(253, 224, 71) !important;
+}
+
+.main-content .text-purple-300,
+.main-content .text-purple-400,
+.main-content .text-purple-500,
+[data-page="dashboard"] .text-purple-300,
+[data-page="dashboard"] .text-purple-400,
+[data-page="dashboard"] .text-purple-500,
+[data-page="tasks"] .text-purple-300,
+[data-page="tasks"] .text-purple-400,
+[data-page="tasks"] .text-purple-500,
+[data-page="calendar"] .text-purple-300,
+[data-page="calendar"] .text-purple-400,
+[data-page="calendar"] .text-purple-500 {
+  color: rgb(196, 181, 253) !important;
+}
+
+.main-content .text-orange-300,
+.main-content .text-orange-400,
+.main-content .text-orange-500,
+[data-page="dashboard"] .text-orange-300,
+[data-page="dashboard"] .text-orange-400,
+[data-page="dashboard"] .text-orange-500,
+[data-page="tasks"] .text-orange-300,
+[data-page="tasks"] .text-orange-400,
+[data-page="tasks"] .text-orange-500,
+[data-page="calendar"] .text-orange-300,
+[data-page="calendar"] .text-orange-400,
+[data-page="calendar"] .text-orange-500 {
+  color: rgb(253, 186, 116) !important;
+}
+
+/* Preserve white/opacity text variations in main pages */
+.main-content .text-white\/80,
+[data-page="dashboard"] .text-white\/80,
+[data-page="tasks"] .text-white\/80,
+[data-page="calendar"] .text-white\/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.main-content .text-white\/60,
+[data-page="dashboard"] .text-white\/60,
+[data-page="tasks"] .text-white\/60,
+[data-page="calendar"] .text-white\/60 {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.main-content .text-white\/40,
+[data-page="dashboard"] .text-white\/40,
+[data-page="tasks"] .text-white\/40,
+[data-page="calendar"] .text-white\/40 {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.main-content .text-white\/20,
+[data-page="dashboard"] .text-white\/20,
+[data-page="tasks"] .text-white\/20,
+[data-page="calendar"] .text-white\/20 {
+  color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Preserve gradient text in main pages */
+.main-content .text-gradient,
+.main-content .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent,
+[data-page="dashboard"] .text-gradient,
+[data-page="dashboard"] .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent,
+[data-page="tasks"] .text-gradient,
+[data-page="tasks"] .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent,
+[data-page="calendar"] .text-gradient,
+[data-page="calendar"] .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, #ffffff, #93c5fd) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* LIGHT MODE SPECIFIC OVERRIDES FOR FORMS AND SETTINGS ONLY */
+.light .settings-modal,
+.light .settings-modal *,
+.light .login-form,
+.light .login-form *,
+.light .modal-form,
+.light .modal-form * {
   color: rgb(31, 41, 55) !important;
 }
 
-.light .text-white\/80 {
-  color: rgb(75, 85, 99) !important;
+.light .settings-modal h1,
+.light .settings-modal h2,
+.light .settings-modal h3,
+.light .settings-modal h4,
+.light .settings-modal h5,
+.light .settings-modal h6,
+.light .login-form h1,
+.light .login-form h2,
+.light .login-form h3,
+.light .login-form h4,
+.light .login-form h5,
+.light .login-form h6,
+.light .modal-form h1,
+.light .modal-form h2,
+.light .modal-form h3,
+.light .modal-form h4,
+.light .modal-form h5,
+.light .modal-form h6 {
+  color: rgb(17, 24, 39) !important;
 }
 
-.light .text-white\/60 {
+/* Light mode placeholder text for forms */
+.light .settings-modal .placeholder-white\/60::placeholder,
+.light .login-form .placeholder-white\/60::placeholder,
+.light .modal-form .placeholder-white\/60::placeholder {
   color: rgb(107, 114, 128) !important;
 }
 
-.light .text-white\/40 {
-  color: rgb(156, 163, 175) !important;
+/* Light mode select options for forms */
+.light .settings-modal select option,
+.light .login-form select option,
+.light .modal-form select option {
+  background: white !important;
+  color: rgb(31, 41, 55) !important;
 }
 
-.light .text-white\/20 {
-  color: rgb(209, 213, 219) !important;
-}
-
-/* Preserve specific colored text in light mode */
-.light .text-blue-300,
-.light .text-blue-400,
-.light .text-blue-500 {
+/* Preserve specific colored text in forms for light mode */
+.light .settings-modal .text-blue-300,
+.light .settings-modal .text-blue-400,
+.light .settings-modal .text-blue-500,
+.light .login-form .text-blue-300,
+.light .login-form .text-blue-400,
+.light .login-form .text-blue-500,
+.light .modal-form .text-blue-300,
+.light .modal-form .text-blue-400,
+.light .modal-form .text-blue-500 {
   color: rgb(59, 130, 246) !important;
 }
 
-.light .text-green-300,
-.light .text-green-400,
-.light .text-green-500 {
+.light .settings-modal .text-green-300,
+.light .settings-modal .text-green-400,
+.light .settings-modal .text-green-500,
+.light .login-form .text-green-300,
+.light .login-form .text-green-400,
+.light .login-form .text-green-500,
+.light .modal-form .text-green-300,
+.light .modal-form .text-green-400,
+.light .modal-form .text-green-500 {
   color: rgb(34, 197, 94) !important;
 }
 
-.light .text-red-300,
-.light .text-red-400,
-.light .text-red-500 {
+.light .settings-modal .text-red-300,
+.light .settings-modal .text-red-400,
+.light .settings-modal .text-red-500,
+.light .login-form .text-red-300,
+.light .login-form .text-red-400,
+.light .login-form .text-red-500,
+.light .modal-form .text-red-300,
+.light .modal-form .text-red-400,
+.light .modal-form .text-red-500 {
   color: rgb(239, 68, 68) !important;
 }
 
-.light .text-yellow-300,
-.light .text-yellow-400,
-.light .text-yellow-500 {
+.light .settings-modal .text-yellow-300,
+.light .settings-modal .text-yellow-400,
+.light .settings-modal .text-yellow-500,
+.light .login-form .text-yellow-300,
+.light .login-form .text-yellow-400,
+.light .login-form .text-yellow-500,
+.light .modal-form .text-yellow-300,
+.light .modal-form .text-yellow-400,
+.light .modal-form .text-yellow-500 {
   color: rgb(245, 158, 11) !important;
 }
 
-.light .text-purple-300,
-.light .text-purple-400,
-.light .text-purple-500 {
+.light .settings-modal .text-purple-300,
+.light .settings-modal .text-purple-400,
+.light .settings-modal .text-purple-500,
+.light .login-form .text-purple-300,
+.light .login-form .text-purple-400,
+.light .login-form .text-purple-500,
+.light .modal-form .text-purple-300,
+.light .modal-form .text-purple-400,
+.light .modal-form .text-purple-500 {
   color: rgb(168, 85, 247) !important;
 }
 
-.light .text-orange-300,
-.light .text-orange-400,
-.light .text-orange-500 {
+.light .settings-modal .text-orange-300,
+.light .settings-modal .text-orange-400,
+.light .settings-modal .text-orange-500,
+.light .login-form .text-orange-300,
+.light .login-form .text-orange-400,
+.light .login-form .text-orange-500,
+.light .modal-form .text-orange-300,
+.light .modal-form .text-orange-400,
+.light .modal-form .text-orange-500 {
   color: rgb(249, 115, 22) !important;
 }
 
-/* Light mode gradient text */
-.light .text-gradient,
-.light .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent {
-  background: linear-gradient(135deg, rgb(31, 41, 55), rgb(59, 130, 246));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Light mode placeholder text */
-.light .placeholder-white\/60::placeholder {
-  color: rgb(107, 114, 128) !important;
-}
-
-/* Light mode select options */
-.light select option {
-  background: white;
-  color: rgb(31, 41, 55);
+/* Light mode gradient text for forms */
+.light .settings-modal .text-gradient,
+.light .settings-modal .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent,
+.light .login-form .text-gradient,
+.light .login-form .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent,
+.light .modal-form .text-gradient,
+.light .modal-form .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, rgb(31, 41, 55), rgb(59, 130, 246)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
 }
