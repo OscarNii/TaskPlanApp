@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../contexts/TaskContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -16,52 +17,13 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-interface UserData {
-  id: string;
-  email: string;
-  name: string;
-  loginTime: string;
-}
-
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { projects, viewMode, setViewMode, getTaskStats, setFilterOptions } = useTask();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const stats = getTaskStats();
-
-  // Check for logged in user
-  useEffect(() => {
-    const userData = localStorage.getItem('taskflow-user');
-    if (userData) {
-      try {
-        setCurrentUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('taskflow-user');
-      }
-    }
-
-    // Listen for auth changes
-    const handleAuthChange = () => {
-      const userData = localStorage.getItem('taskflow-user');
-      if (userData) {
-        try {
-          setCurrentUser(JSON.parse(userData));
-        } catch (error) {
-          console.error('Error parsing user data:', error);
-          localStorage.removeItem('taskflow-user');
-          setCurrentUser(null);
-        }
-      } else {
-        setCurrentUser(null);
-      }
-    };
-
-    window.addEventListener('auth-change', handleAuthChange);
-    return () => window.removeEventListener('auth-change', handleAuthChange);
-  }, []);
 
   const navigationItems = [
     { 
@@ -90,14 +52,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('taskflow-user');
-    setCurrentUser(null);
-    setShowUserMenu(false);
-    
-    // Trigger auth state change
-    window.dispatchEvent(new CustomEvent('auth-change'));
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setShowUserMenu(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleLogin = () => {
@@ -142,22 +104,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const formatLoginTime = (loginTime: string) => {
-    const date = new Date(loginTime);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays > 0) {
-      return `${diffDays}d ago`;
-    } else if (diffHours > 0) {
-      return `${diffHours}h ago`;
-    } else {
-      return 'Just now';
-    }
   };
 
   const truncateEmail = (email: string, maxLength: number = 20) => {
@@ -320,18 +266,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           {/* User Section - Responsive */}
           <div className="p-3 sm:p-4">
             <div className="relative">
-              {currentUser ? (
+              {user && profile ? (
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white bg-white/5 backdrop-blur-sm border border-white/10 group"
                 >
                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 text-white font-semibold text-xs sm:text-sm">
-                    {getInitials(currentUser.name)}
+                    {getInitials(profile.name)}
                   </div>
                   <div className="flex-1 text-left min-w-0">
-                    <div className="text-xs sm:text-sm font-medium text-white truncate">{currentUser.name}</div>
+                    <div className="text-xs sm:text-sm font-medium text-white truncate">{profile.name}</div>
                     <div className="text-xs text-white/60 truncate">
-                      <span className="hidden sm:inline">Active </span>{formatLoginTime(currentUser.loginTime)}
+                      Online
                     </div>
                   </div>
                 </button>
@@ -350,17 +296,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 </button>
               )}
 
-              {showUserMenu && currentUser && (
+              {showUserMenu && user && profile && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden z-50">
                   <div className="p-3 sm:p-4 border-b border-white/20">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
-                        {getInitials(currentUser.name)}
+                        {getInitials(profile.name)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs sm:text-sm font-medium text-white truncate">{currentUser.name}</div>
-                        <div className="text-xs text-white/60 truncate" title={currentUser.email}>
-                          {truncateEmail(currentUser.email)}
+                        <div className="text-xs sm:text-sm font-medium text-white truncate">{profile.name}</div>
+                        <div className="text-xs text-white/60 truncate" title={profile.email}>
+                          {truncateEmail(profile.email)}
                         </div>
                       </div>
                     </div>

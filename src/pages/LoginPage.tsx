@@ -12,9 +12,9 @@ import {
   Chrome,
   Apple,
   Check,
-  AlertCircle,
-  Home
+  AlertCircle
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface FormData {
   email: string;
@@ -35,6 +35,7 @@ interface FormErrors {
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -47,19 +48,6 @@ const LoginPage: React.FC = () => {
     name: '',
     acceptTerms: false
   });
-
-  // Mock user database (in production, this would be a real database)
-  const mockUsers = [
-    { id: '1', email: 'demo@taskflow.com', password: 'demo123', name: 'Demo User' },
-    { id: '2', email: 'john@example.com', password: 'password123', name: 'John Doe' },
-    { id: '3', email: 'jane@example.com', password: 'password123', name: 'Jane Smith' }
-  ];
-
-  // Helper function to trigger auth state change
-  const triggerAuthChange = () => {
-    // Dispatch custom event to notify App component
-    window.dispatchEvent(new CustomEvent('auth-change'));
-  };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -99,12 +87,6 @@ const LoginPage: React.FC = () => {
       if (!formData.acceptTerms) {
         newErrors.acceptTerms = 'You must accept the terms and conditions';
       }
-
-      // Check if email already exists
-      const existingUser = mockUsers.find(user => user.email.toLowerCase() === formData.email.toLowerCase());
-      if (existingUser) {
-        newErrors.email = 'An account with this email already exists';
-      }
     }
 
     setErrors(newErrors);
@@ -122,59 +104,26 @@ const LoginPage: React.FC = () => {
     setErrors({});
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       if (isLogin) {
         // Handle sign in
-        const user = mockUsers.find(
-          u => u.email.toLowerCase() === formData.email.toLowerCase() && 
-               u.password === formData.password
-        );
+        const { error } = await signIn(formData.email, formData.password);
 
-        if (user) {
-          // Store user session (in production, use proper auth tokens)
-          const userData = {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            loginTime: new Date().toISOString()
-          };
-          
-          localStorage.setItem('taskflow-user', JSON.stringify(userData));
-          
-          console.log('✅ Sign in successful:', user.name);
-          
-          // Trigger auth state change and navigate
-          triggerAuthChange();
-          navigate('/');
+        if (error) {
+          setErrors({ general: error.message || 'Invalid email or password. Please try again.' });
         } else {
-          setErrors({ general: 'Invalid email or password. Please try again.' });
+          console.log('✅ Sign in successful');
+          navigate('/');
         }
       } else {
         // Handle sign up
-        const newUser = {
-          id: Date.now().toString(),
-          email: formData.email,
-          password: formData.password,
-          name: formData.name
-        };
+        const { error } = await signUp(formData.email, formData.password, formData.name);
 
-        // Store user session
-        const userData = {
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name,
-          loginTime: new Date().toISOString()
-        };
-        
-        localStorage.setItem('taskflow-user', JSON.stringify(userData));
-
-        console.log('✅ Sign up successful:', newUser.name);
-        
-        // Trigger auth state change and navigate
-        triggerAuthChange();
-        navigate('/');
+        if (error) {
+          setErrors({ general: error.message || 'Failed to create account. Please try again.' });
+        } else {
+          console.log('✅ Sign up successful');
+          navigate('/');
+        }
       }
     } catch (error) {
       setErrors({ general: 'Something went wrong. Please try again.' });
@@ -189,51 +138,14 @@ const LoginPage: React.FC = () => {
     setErrors({});
     
     try {
-      console.log(`🔗 Attempting to login with ${provider}...`);
-      
-      // Simulate social login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful social login
-      const socialUser = {
-        id: Date.now().toString(),
-        email: `user@${provider.toLowerCase()}.com`,
-        name: `${provider} User`,
-        provider,
-        loginTime: new Date().toISOString()
-      };
-
-      localStorage.setItem('taskflow-user', JSON.stringify(socialUser));
-
-      console.log(`✅ ${provider} login successful:`, socialUser.name);
-      
-      // Trigger auth state change and navigate
-      triggerAuthChange();
-      navigate('/');
+      console.log(`🔗 Social login with ${provider} not implemented yet`);
+      setErrors({ general: `${provider} login will be available soon!` });
     } catch (error) {
       setErrors({ general: `Failed to sign in with ${provider}. Please try again.` });
       console.error(`${provider} login error:`, error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoToHomepage = () => {
-    // Create a guest user session for demo purposes
-    const guestUser = {
-      id: 'guest',
-      email: 'guest@taskflow.com',
-      name: 'Guest User',
-      loginTime: new Date().toISOString(),
-      isGuest: true
-    };
-
-    localStorage.setItem('taskflow-user', JSON.stringify(guestUser));
-    console.log('🏠 Navigating to homepage as guest');
-    
-    // Trigger auth state change and navigate
-    triggerAuthChange();
-    navigate('/');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,18 +184,6 @@ const LoginPage: React.FC = () => {
         <div className="absolute -bottom-20 sm:-bottom-40 -left-20 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-gradient-to-br from-pink-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-96 sm:h-96 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
-
-      {/* Homepage button - responsive positioning */}
-      <button
-        onClick={handleGoToHomepage}
-        disabled={isLoading}
-        className="fixed top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-50 flex items-center space-x-1 sm:space-x-2 px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 group disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 text-sm sm:text-base"
-      >
-        <Home className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-        <span className="font-medium hidden xs:inline">Go to Homepage</span>
-        <span className="font-medium xs:hidden">Home</span>
-        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
-      </button>
 
       {/* Main container - responsive width and spacing */}
       <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl relative z-10">
@@ -335,7 +235,7 @@ const LoginPage: React.FC = () => {
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg sm:rounded-xl">
               <h4 className="text-blue-300 font-medium mb-2 flex items-center text-sm sm:text-base">
                 <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                Demo Credentials
+                Demo Account
               </h4>
               <div className="text-xs sm:text-sm text-blue-200/80 space-y-1">
                 <p><strong>Email:</strong> demo@taskflow.com</p>
@@ -343,17 +243,6 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* Guest access info - responsive text */}
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-500/10 border border-green-400/30 rounded-lg sm:rounded-xl">
-            <h4 className="text-green-300 font-medium mb-2 flex items-center text-sm sm:text-base">
-              <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-              Quick Access
-            </h4>
-            <p className="text-xs sm:text-sm text-green-200/80">
-              Want to explore TaskFlow? Click the "Go to Homepage" button above to access the app as a guest user.
-            </p>
-          </div>
 
           {/* General error message - responsive text */}
           {errors.general && (
