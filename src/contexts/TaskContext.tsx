@@ -141,7 +141,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user logged in');
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -251,7 +254,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addProject = async (projectData: Omit<Project, 'id' | 'taskCount' | 'completedTasks'>) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user logged in');
+      return;
+    }
 
     try {
       const { data, error } = await supabase
