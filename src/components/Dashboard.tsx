@@ -32,6 +32,36 @@ const Dashboard: React.FC = () => {
 
   const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
+  // Function to get time-based greeting
+  const getTimeBasedGreeting = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour >= 5 && currentHour < 12) {
+      return 'Good morning! ☀️';
+    } else if (currentHour >= 12 && currentHour < 17) {
+      return 'Good afternoon! 🌤️';
+    } else if (currentHour >= 17 && currentHour < 21) {
+      return 'Good evening! 🌅';
+    } else {
+      return 'Good night! 🌙';
+    }
+  };
+
+  // Function to get time-based message
+  const getTimeBasedMessage = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour >= 5 && currentHour < 12) {
+      return `You have ${stats.pending} tasks to tackle today`;
+    } else if (currentHour >= 12 && currentHour < 17) {
+      return `You have ${stats.pending} tasks remaining for today`;
+    } else if (currentHour >= 17 && currentHour < 21) {
+      return `You have ${stats.pending} tasks to wrap up`;
+    } else {
+      return `You have ${stats.pending} tasks for tomorrow`;
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
@@ -39,9 +69,9 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-              Good morning! 👋
+              {getTimeBasedGreeting()}
             </h1>
-            <p className="text-white/80 text-lg">You have {stats.pending} tasks pending today</p>
+            <p className="text-white/80 text-lg">{getTimeBasedMessage()}</p>
           </div>
           <div className="hidden sm:block">
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-lg">
