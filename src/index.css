@@ -340,6 +340,7 @@
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: rgb(31, 41, 55);
 }
 
 .light .glass-morphism-enhanced {
@@ -353,6 +354,7 @@
     0 16px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  color: rgb(31, 41, 55);
 }
 
 .light .glass-card {
@@ -365,6 +367,7 @@
   box-shadow: 
     0 8px 24px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: rgb(31, 41, 55);
 }
 
 .light .glass-input {
@@ -452,6 +455,46 @@
   box-shadow: 
     0 6px 20px rgba(59, 130, 246, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.light .glass-privacy-item {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: rgb(75, 85, 99);
+}
+
+.light .glass-button-secondary {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(59, 130, 246, 0.05) 100%
+  );
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: rgb(59, 130, 246);
+}
+
+.light .glass-button-success {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(16, 185, 129, 0.05) 100%
+  );
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: rgb(16, 185, 129);
+}
+
+.light .glass-button-danger {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    rgba(239, 68, 68, 0.05) 100%
+  );
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: rgb(239, 68, 68);
 }
 
 /* Glass morphism effect utilities */
@@ -603,4 +646,101 @@ body.dark {
 /* Theme transition */
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light mode text color overrides */
+.light * {
+  color: rgb(31, 41, 55);
+}
+
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light h6 {
+  color: rgb(17, 24, 39);
+}
+
+.light p,
+.light span,
+.light div {
+  color: rgb(31, 41, 55);
+}
+
+.light .text-white {
+  color: rgb(31, 41, 55) !important;
+}
+
+.light .text-white\/80 {
+  color: rgb(75, 85, 99) !important;
+}
+
+.light .text-white\/60 {
+  color: rgb(107, 114, 128) !important;
+}
+
+.light .text-white\/40 {
+  color: rgb(156, 163, 175) !important;
+}
+
+.light .text-white\/20 {
+  color: rgb(209, 213, 219) !important;
+}
+
+/* Preserve specific colored text in light mode */
+.light .text-blue-300,
+.light .text-blue-400,
+.light .text-blue-500 {
+  color: rgb(59, 130, 246) !important;
+}
+
+.light .text-green-300,
+.light .text-green-400,
+.light .text-green-500 {
+  color: rgb(34, 197, 94) !important;
+}
+
+.light .text-red-300,
+.light .text-red-400,
+.light .text-red-500 {
+  color: rgb(239, 68, 68) !important;
+}
+
+.light .text-yellow-300,
+.light .text-yellow-400,
+.light .text-yellow-500 {
+  color: rgb(245, 158, 11) !important;
+}
+
+.light .text-purple-300,
+.light .text-purple-400,
+.light .text-purple-500 {
+  color: rgb(168, 85, 247) !important;
+}
+
+.light .text-orange-300,
+.light .text-orange-400,
+.light .text-orange-500 {
+  color: rgb(249, 115, 22) !important;
+}
+
+/* Light mode gradient text */
+.light .text-gradient,
+.light .bg-gradient-to-r.from-white.to-blue-200.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, rgb(31, 41, 55), rgb(59, 130, 246));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Light mode placeholder text */
+.light .placeholder-white\/60::placeholder {
+  color: rgb(107, 114, 128) !important;
+}
+
+/* Light mode select options */
+.light select option {
+  background: white;
+  color: rgb(31, 41, 55);
 }
