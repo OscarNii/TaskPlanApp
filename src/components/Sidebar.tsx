@@ -6,13 +6,11 @@ import {
   CheckSquare, 
   Calendar,
   Plus,
-  Settings,
   X,
   LogOut,
   User
 } from 'lucide-react';
 import AddProjectModal from './AddProjectModal';
-import SettingsModal from './SettingsModal';
 
 interface SidebarProps {
   onClose: () => void;
@@ -29,7 +27,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { projects, viewMode, setViewMode, getTaskStats } = useTask();
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const stats = getTaskStats();
@@ -292,19 +289,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
         {/* Footer - Fixed */}
         <div className="flex-shrink-0 border-t border-white/20 dark:border-white/10">
-          {/* Settings */}
-          <div className="p-3 sm:p-4 space-y-1 sm:space-y-2">
-            <button 
-              onClick={() => setShowSettings(true)}
-              className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 text-white/80 hover:text-white group"
-            >
-              <Settings size={18} className="transition-transform group-hover:scale-110 flex-shrink-0" />
-              <span className="font-medium text-sm sm:text-base">Settings</span>
-            </button>
-          </div>
-
           {/* User Section - Responsive */}
-          <div className="p-3 sm:p-4 border-t border-white/20 dark:border-white/10">
+          <div className="p-3 sm:p-4">
             <div className="relative">
               {currentUser ? (
                 <button
@@ -352,16 +338,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                     </div>
                   </div>
                   <button
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      setShowSettings(true);
-                    }}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-white/10 transition-colors text-white/80 hover:text-white flex items-center space-x-2 sm:space-x-3"
-                  >
-                    <User size={14} />
-                    <span className="text-xs sm:text-sm">Profile Settings</span>
-                  </button>
-                  <button
                     onClick={handleLogout}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-red-500/20 transition-colors text-red-400 hover:text-red-300 flex items-center space-x-2 sm:space-x-3"
                   >
@@ -379,12 +355,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <AddProjectModal
           onClose={() => setShowAddProject(false)}
           onAdd={() => setShowAddProject(false)}
-        />
-      )}
-
-      {showSettings && (
-        <SettingsModal
-          onClose={() => setShowSettings(false)}
         />
       )}
     </>
