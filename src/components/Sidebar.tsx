@@ -10,9 +10,12 @@ import {
   Plus,
   X,
   LogOut,
-  User
+  User,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 import AddProjectModal from './AddProjectModal';
+import AIAssistant from './AIAssistant';
 
 interface SidebarProps {
   onClose: () => void;
@@ -24,6 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
   const stats = getTaskStats();
 
   const navigationItems = [
@@ -211,6 +215,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             ))}
           </nav>
 
+          {/* AI Assistant Quick Access */}
+          <div className="flex-shrink-0 p-3 sm:p-4">
+            <button
+              onClick={() => setShowAIAssistant(true)}
+              className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500/20 to-blue-600/20 hover:from-purple-500/30 hover:to-blue-600/30 rounded-lg sm:rounded-xl transition-all duration-300 border border-purple-400/30 text-purple-300 hover:text-purple-200 group"
+            >
+              <Bot size={18} className="transition-transform group-hover:scale-110 flex-shrink-0" />
+              <span className="font-medium text-sm sm:text-base truncate">AI Assistant</span>
+              <Sparkles size={14} className="ml-auto text-yellow-400 animate-pulse" />
+            </button>
+          </div>
+
           {/* Projects Section - Scrollable */}
           <div className="flex-1 flex flex-col min-h-0 border-t border-white/20 dark:border-white/10">
             <div className="flex-shrink-0 p-3 sm:p-4 pb-2">
@@ -339,6 +355,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           onClose={() => setShowAddProject(false)}
           onAdd={() => setShowAddProject(false)}
         />
+      )}
+
+      {showAIAssistant && (
+        <AIAssistant onClose={() => setShowAIAssistant(false)} />
       )}
     </>
   );

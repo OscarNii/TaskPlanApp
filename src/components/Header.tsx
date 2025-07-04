@@ -1,11 +1,12 @@
 import React from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, Filter, Plus, ArrowLeft, Bell, Settings } from 'lucide-react';
+import { Search, Filter, Plus, ArrowLeft, Bell, Settings, Bot } from 'lucide-react';
 import AddTaskModal from './AddTaskModal';
 import FilterModal from './FilterModal';
 import NotificationCenter from './NotificationCenter';
 import SettingsModal from './SettingsModal';
+import AIAssistant from './AIAssistant';
 
 const Header: React.FC = () => {
   const { filterOptions, setFilterOptions, viewMode } = useTask();
@@ -13,6 +14,7 @@ const Header: React.FC = () => {
   const [showFilter, setShowFilter] = React.useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
+  const [showAIAssistant, setShowAIAssistant] = React.useState(false);
   const location = useLocation();
 
   // Mock user ID - in a real app, this would come from auth context
@@ -109,6 +111,18 @@ const Header: React.FC = () => {
                 </div>
               )}
 
+              {/* AI Assistant */}
+              <button
+                onClick={() => setShowAIAssistant(true)}
+                className="relative p-3 bg-gradient-to-r from-purple-500/20 to-blue-600/20 hover:from-purple-500/30 hover:to-blue-600/30 rounded-xl transition-all duration-300 border border-purple-400/30 shadow-lg hover:shadow-xl text-purple-300 hover:text-purple-200 group"
+              >
+                <Bot size={20} />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full border-2 border-white/20 animate-pulse"></span>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  AI Assistant
+                </div>
+              </button>
+
               {/* Settings */}
               <button
                 onClick={() => setShowSettings(true)}
@@ -189,6 +203,12 @@ const Header: React.FC = () => {
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showAIAssistant && (
+        <AIAssistant
+          onClose={() => setShowAIAssistant(false)}
         />
       )}
     </>
