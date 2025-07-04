@@ -13,7 +13,9 @@ import {
   Brain,
   Target,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Minimize2,
+  Maximize2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTask } from '../contexts/TaskContext';
@@ -33,6 +35,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ onClose }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [taskSuggestions, setTaskSuggestions] = useState<TaskSuggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -187,6 +190,65 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ onClose }) => {
     { icon: Brain, text: "Break down a complex task", prompt: "I have a large, complex task that feels overwhelming. How should I break it down?" }
   ];
 
+  // Minimized view
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-gradient-to-r from-purple-500/90 to-blue-600/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-4 min-w-[280px]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <Bot className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-white text-sm">AI Assistant</h3>
+                <p className="text-white/70 text-xs">
+                  {activeConversation ? `${activeConversation.messages.length} messages` : 'Ready to help'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => setIsMinimized(false)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors text-white/80 hover:text-white"
+                title="Maximize"
+              >
+                <Maximize2 size={16} />
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors text-white/80 hover:text-white"
+                title="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+          
+          {/* Quick message input when minimized */}
+          <div className="mt-3 flex space-x-2">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+              placeholder="Quick message..."
+              className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 text-white placeholder-white/60 text-sm"
+              disabled={isLoading}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!message.trim() || isLoading}
+              className="px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white/10 dark:bg-black/20 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] border border-white/20 flex overflow-hidden">
@@ -205,12 +267,30 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ onClose }) => {
                   <p className="text-xs text-white/60">Powered by ChatGPT</p>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white"
-              >
-                <X size={20} />
-              </button>
+              
+              {/* Window Controls */}
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={() => setIsMinimized(true)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white group"
+                  title="Minimize"
+                >
+                  <Minimize2 size={16} />
+                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    Minimize
+                  </div>
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-red-500/20 hover:border-red-400/30 rounded-lg transition-colors text-white/80 hover:text-red-300 group border border-transparent"
+                  title="Close"
+                >
+                  <X size={16} />
+                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    Close
+                  </div>
+                </button>
+              </div>
             </div>
             
             <button
@@ -278,13 +358,23 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ onClose }) => {
             <>
               {/* Chat Header */}
               <div className="p-6 border-b border-white/20">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">{activeConversation.title}</h3>
+                      <p className="text-sm text-white/60">AI Productivity Assistant</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white">{activeConversation.title}</h3>
-                    <p className="text-sm text-white/60">AI Productivity Assistant</p>
+                  
+                  {/* Chat Status */}
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 px-3 py-1 bg-green-500/20 rounded-full border border-green-400/30">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-green-300 font-medium">Online</span>
+                    </div>
                   </div>
                 </div>
               </div>
