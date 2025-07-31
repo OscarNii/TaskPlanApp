@@ -1,0 +1,1 @@
+TaskPlanApp is a web application for efficient task planning and management. Built primarily with TypeScript, it features a modern interface and robust functionality for organizing tasks, designed to enhance productivity. The app is accessible online at https://task-plan-app.vercel.app.
